@@ -2,7 +2,6 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://jakarta.ee/xml/ns/jakartaee" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd" id="WebApp_ID" version="5.0">
   <display-name>SNMP_TASK</display-name>
   
-  
   <servlet>
     <servlet-name>GetData</servlet-name>
     <servlet-class>com.example.site24x7.snmp.GetData</servlet-class>
