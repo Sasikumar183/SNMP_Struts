@@ -17,7 +17,7 @@ import org.json.JSONObject;
 import com.example.site24x7.db.DatabaseConfig;
 import com.opensymphony.xwork2.ActionSupport;
 
-@SuppressWarnings({ "deprecation", "serial" })
+@SuppressWarnings({"deprecation", "serial"})
 
 public class GetIPs extends ActionSupport implements ServletRequestAware {
     private InputStream input;
@@ -35,11 +35,9 @@ public class GetIPs extends ActionSupport implements ServletRequestAware {
         try (Connection con = DatabaseConfig.getConnection();
              Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
-
             while (rs.next()) {
-                ipList.put(rs.getString(1));  // Fixed index from 0 to 1
+                ipList.put(rs.getString(1)); 
             }
-
             JSONObject res = new JSONObject();
             res.put("data", ipList);
             String jsonString = res.toString(4);

@@ -2,17 +2,16 @@ package com.example.site24x7.restapi;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import java.util.*;
 import java.time.LocalDate;
 
 public class CassandraDataAggregator {
-	
-	
-	public static JSONArray getAggregated(JSONArray jsonArray,String interval) {
-		return processAggregation(jsonArray, interval);
-	}
-    
-     
+
+    public static JSONArray getAggregated(JSONArray jsonArray, String interval) {
+        return processAggregation(jsonArray, interval);
+    }
+
 
     public static JSONArray processAggregation(JSONArray jsonArray, String interval) {
         Map<String, JSONObject> aggregatedData = new HashMap<>();
@@ -25,7 +24,7 @@ public class CassandraDataAggregator {
             String key;
             if (interval.equals("1w") || interval.equals("30d")) {
                 key = date.toString(); // Group by day
-            }  else {
+            } else {
                 continue;
             }
 
@@ -68,14 +67,7 @@ public class CassandraDataAggregator {
     }
 
     private static void aggregateValues(JSONObject aggregated, JSONObject record) {
-    	System.out.println("--------------------------------------------");
-
-    	System.out.println(aggregated);
-    	System.out.println("--------------------------------------------");
-    	System.out.println(record);
-    	System.out.println("--------------------------------------------");
-
-    	aggregated.put("count_in_discard", aggregated.getInt("sum_in_discard") + record.getInt("count_in_discard"));
+        aggregated.put("count_in_discard", aggregated.getInt("sum_in_discard") + record.getInt("count_in_discard"));
         aggregated.put("min_in_discard", Math.min(aggregated.getInt("min_in_discard"), record.getInt("min_in_discard")));
         aggregated.put("count_in_error", aggregated.getInt("sum_in_error") + record.getInt("count_in_error"));
         aggregated.put("min_out_discard", Math.min(aggregated.getInt("min_out_discard"), record.getInt("min_out_discard")));

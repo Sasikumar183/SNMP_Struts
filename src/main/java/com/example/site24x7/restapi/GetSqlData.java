@@ -4,12 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import com.example.site24x7.db.DatabaseConfig;
 
 public class GetSqlData {
-    
+
     public static JSONObject getData(StringBuilder query) {
         JSONObject jsonRes = new JSONObject();
 
@@ -19,14 +20,14 @@ public class GetSqlData {
             ResultSet mysqlResultSet = ps.executeQuery();
 
             String statusQuery = """
-                SELECT id, oper_status, admin_status
-                FROM (
-                    SELECT id, oper_status, admin_status, 
-                           ROW_NUMBER() OVER (PARTITION BY id ORDER BY collected_time DESC) AS rn
-                    FROM inter_details
-                ) t
-                WHERE rn = 1;
-            """;
+                        SELECT id, oper_status, admin_status
+                        FROM (
+                            SELECT id, oper_status, admin_status, 
+                                   ROW_NUMBER() OVER (PARTITION BY id ORDER BY collected_time DESC) AS rn
+                            FROM inter_details
+                        ) t
+                        WHERE rn = 1;
+                    """;
 
             PreparedStatement statusStmt = con.prepareStatement(statusQuery);
             ResultSet statusResultSet = statusStmt.executeQuery();

@@ -33,13 +33,12 @@ public class ArchiveData implements ServletContextListener {
             }
             scheduler = Executors.newScheduledThreadPool(1);
 
-            // Schedule tasks at fixed times
-            scheduler.scheduleAtFixedRate(this::insertDummyData, 
-                calculateDelayUntil(13, 15), 24 * 60 * 60, TimeUnit.SECONDS);
+            scheduler.scheduleAtFixedRate(this::insertDummyData,
+                    calculateDelayUntil(13, 15), 24 * 60 * 60, TimeUnit.SECONDS);
 
             scheduler.scheduleAtFixedRate(() -> {
                 try {
-                    removeData();
+                    RemoveData.removeData();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 } catch (Exception e) {
@@ -48,45 +47,31 @@ public class ArchiveData implements ServletContextListener {
             }, calculateDelayUntil(15, 59), 24 * 60 * 60, TimeUnit.SECONDS);
 
             scheduler.scheduleAtFixedRate(() -> {
-				try {
-					StoreData.fetchData();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}, 0, 1, TimeUnit.MINUTES);
+                try {
+                    StoreData.fetchData();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }, 0, 1, TimeUnit.MINUTES);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-  
-	private static long calculateDelayUntil(int targetHour, int targetMinute) {
-		    LocalTime now = LocalTime.now();
-		    LocalTime targetTime = LocalTime.of(targetHour, targetMinute);
-		
-		    if (now.isAfter(targetTime)) {
-		        return 24 * 60 * 60; 
-		    }
-		    return java.time.Duration.between(now, targetTime).getSeconds();
-	} 
-    
-	private void insertDummyData() {	
-		System.out.println("Working");
-	    InsertToCassandra.insertToCassandra();
-	}
-	
-    
-    public void removeData() throws SQLException {
-        String query = "DELETE FROM inter_details WHERE collected_time >= CONCAT(DATE_SUB(CURDATE(), INTERVAL 1 DAY), ' 10:00:00') AND collected_time < CONCAT(CURDATE(), ' 10:00:00');";
-        
-        Connection conn = DatabaseConfig.getConnection();
-        Statement stmt = conn.createStatement();
-        
-        int rowsAffected = stmt.executeUpdate(query);
-        System.out.println(rowsAffected + " rows deleted.");
-        
-        stmt.close();
-        conn.close();
+
+    private static long calculateDelayUntil(int targetHour, int targetMinute) {
+        LocalTime now = LocalTime.now();
+        LocalTime targetTime = LocalTime.of(targetHour, targetMinute);
+
+        if (now.isAfter(targetTime)) {
+            return 24 * 60 * 60;
+        }
+        return java.time.Duration.between(now, targetTime).getSeconds();
+    }
+
+    private void insertDummyData() {
+        System.out.println("Working");
+        InsertToCassandra.insertToCassandra();
     }
 
 
@@ -97,6 +82,5 @@ public class ArchiveData implements ServletContextListener {
             session.close();
         }
     }
-   
 
 }

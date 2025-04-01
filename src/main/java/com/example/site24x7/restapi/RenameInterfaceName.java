@@ -16,18 +16,17 @@ import org.json.JSONObject;
 
 @SuppressWarnings("deprecation")
 public class RenameInterfaceName extends ActionSupport implements ServletRequestAware {
-
     private static final long serialVersionUID = 1L;
     private InputStream input;
     private HttpServletRequest request;
 
     public String execute() {
-    	
-    	if (!"PATCH".equalsIgnoreCase(request.getMethod())) {
+
+        if (!"PATCH".equalsIgnoreCase(request.getMethod())) {
             input = new ByteArrayInputStream("Invalid Request Method".getBytes(StandardCharsets.UTF_8));
             return SUCCESS;
         }
-    	
+
         String name = request.getParameter("name");
         int id = Integer.parseInt(request.getParameter("id"));
         String query = "UPDATE interface SET interface_name = ? WHERE id = ?";
