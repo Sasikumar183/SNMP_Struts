@@ -8,11 +8,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.example.site24x7.db.DatabaseConfig;
+import com.example.site24x7.queries.SNMPQueries;
 
 public class GetId {
     public static Map<String, Integer> retrieveId() {
 
-        String query = "SELECT id,IP,idx from interface;";
+        String query = SNMPQueries.getId;
         Map<String, Integer> res = new HashMap<String, Integer>();
 
         Connection con;

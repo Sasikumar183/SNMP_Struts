@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.example.site24x7.db.DatabaseConfig;
+import com.example.site24x7.queries.RESTAPIQueries;
 import com.example.site24x7.snmp.CheckDeletion;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -28,7 +29,9 @@ public class DeleteInterfaceData extends ActionSupport implements ServletRequest
             input = new ByteArrayInputStream("Invalid Request Method".getBytes(StandardCharsets.UTF_8));
             return SUCCESS;
         }
-        String cqlDeleteQuery = "DELETE FROM snmp_interface_traffic WHERE interface_ip=? and interface_idx=?;";
+        
+        String cqlDeleteQuery = RESTAPIQueries.cqlDeleteQuery;
+        
         int id = Integer.parseInt(request.getParameter("id"));
         int index = Integer.parseInt(request.getParameter("index"));
         String ip = request.getParameter("ip");

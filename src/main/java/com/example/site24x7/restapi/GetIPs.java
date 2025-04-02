@@ -15,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.example.site24x7.db.DatabaseConfig;
+import com.example.site24x7.queries.RESTAPIQueries;
 import com.opensymphony.xwork2.ActionSupport;
 
 @SuppressWarnings({"deprecation", "serial"})
@@ -30,7 +31,7 @@ public class GetIPs extends ActionSupport implements ServletRequestAware {
         }
 
         JSONArray ipList = new JSONArray();
-        String query = "SELECT DISTINCT IP FROM interface";
+        String query = RESTAPIQueries.GETIP;
 
         try (Connection con = DatabaseConfig.getConnection();
              Statement stmt = con.createStatement();

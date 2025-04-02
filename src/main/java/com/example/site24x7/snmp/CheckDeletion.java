@@ -8,11 +8,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.example.site24x7.db.DatabaseConfig;
+import com.example.site24x7.queries.SNMPQueries;
 
 public class CheckDeletion {
 
     public static Map<String, Integer> isDeleted() {
-        String query = "SELECT IP, idx, isDeleted FROM interface;";
+        String query = SNMPQueries.checkDeletionCheck;
         Map<String, Integer> deleteCheck = new HashMap<String, Integer>();
         try (Connection con = DatabaseConfig.getConnection(); PreparedStatement ps = con.prepareStatement(query)) {
 
@@ -32,7 +33,7 @@ public class CheckDeletion {
     }
 
     public static void changeStatus(String IP, int idx) {
-        String query = "UPDATE interface set isDeleted = 1 WHERE IP = ? AND idx = ?";
+        String query = SNMPQueries.checkDeletionUpdate;
         try {
             Connection con = DatabaseConfig.getConnection();
             PreparedStatement ps = con.prepareStatement(query);

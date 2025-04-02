@@ -15,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.example.site24x7.db.DatabaseConfig;
+import com.example.site24x7.queries.RESTAPIQueries;
 import com.opensymphony.xwork2.ActionSupport;
 
 @SuppressWarnings({"deprecation", "serial"})
@@ -31,7 +32,7 @@ public class FetchInterfaces extends ActionSupport implements ServletRequestAwar
 
         JSONArray inter_details = new JSONArray();
         String ip = request.getParameter("ip");
-        String query = "SELECT idx,interface_name from interface where IP = ?;";
+        String query = RESTAPIQueries.fetchInterface;
 
 
         try (Connection con = DatabaseConfig.getConnection();
@@ -43,9 +44,9 @@ public class FetchInterfaces extends ActionSupport implements ServletRequestAwar
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     JSONObject obj = new JSONObject();
-                    obj.put("interface_name", rs.getString("interface_name"));  // Fix duplicate "index"
-                    obj.put("index", rs.getInt("idx"));  // Unique key name
-                    inter_details.put(obj);  // Store the JSON object correctly
+                    obj.put("interface_name", rs.getString("interface_name")); 
+                    obj.put("index", rs.getInt("idx"));
+                    inter_details.put(obj);
                 }
             }
             JSONObject res = new JSONObject();

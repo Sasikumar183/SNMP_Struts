@@ -3,68 +3,42 @@ package com.example.site24x7.restapi;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.example.site24x7.setter.CreateEmptyRecord;
+
 import java.util.*;
 import java.time.LocalDate;
 
 public class CassandraDataAggregator {
 
-    public static JSONArray getAggregated(JSONArray jsonArray, String interval) {
-        return processAggregation(jsonArray, interval);
-    }
+	public static JSONArray getAggregated(JSONArray jsonArray, String interval) {
+		return processAggregation(jsonArray, interval);
+	}
 
+	public static JSONArray processAggregation(JSONArray jsonArray, String interval) {
+		Map<String, JSONObject> aggregatedData = new HashMap<>();
 
-    public static JSONArray processAggregation(JSONArray jsonArray, String interval) {
-        Map<String, JSONObject> aggregatedData = new HashMap<>();
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject record = jsonArray.getJSONObject(i);
+			String timestamp = record.getString("hour_slot");
+			LocalDate date = LocalDate.parse(timestamp.split(" ")[0]);
 
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject record = jsonArray.getJSONObject(i);
-            String timestamp = record.getString("hour_slot");
-            LocalDate date = LocalDate.parse(timestamp.split(" ")[0]);
+			String key;
+			if (interval.equals("1w") || interval.equals("30d")) {
+				key = date.toString();
+			} else {
+				continue;
+			}
 
-            String key;
-            if (interval.equals("1w") || interval.equals("30d")) {
-                key = date.toString(); // Group by day
-            } else {
-                continue;
-            }
+			aggregatedData.putIfAbsent(key, CreateEmptyRecord.createEmptyRecord(key));
 
-            aggregatedData.putIfAbsent(key, createEmptyRecord(key));
+			JSONObject aggregated = aggregatedData.get(key);
+			aggregateValues(aggregated, record);
+		}
 
-            JSONObject aggregated = aggregatedData.get(key);
-            aggregateValues(aggregated, record);
-        }
+		return new JSONArray(aggregatedData.values());
+	}
 
-        return new JSONArray(aggregatedData.values());
-    }
-
-    private static JSONObject createEmptyRecord(String key) {
-        JSONObject obj = new JSONObject();
-        obj.put("date", key);
-        obj.put("sum_in_discard", 0);
-        obj.put("min_in_discard", Integer.MAX_VALUE);
-        obj.put("sum_in_error", 0);
-        obj.put("min_out_discard", Integer.MAX_VALUE);
-        obj.put("max_out_traffic", 0);
-        obj.put("avg_in_traffic", 0);
-        obj.put("max_in_discard", 0);
-        obj.put("min_out_traffic", Integer.MAX_VALUE);
-        obj.put("sum_out_error", 0);
-        obj.put("min_out_error", Integer.MAX_VALUE);
-        obj.put("min_in_traffic", Integer.MAX_VALUE);
-        obj.put("max_out_discard", 0);
-        obj.put("max_out_error", 0);
-        obj.put("avg_in_discard", 0);
-        obj.put("avg_out_discard", 0);
-        obj.put("avg_in_error", 0);
-        obj.put("max_in_error", 0);
-        obj.put("avg_out_traffic", 0);
-        obj.put("max_in_traffic", 0);
-        obj.put("interface_id", -1);
-        obj.put("min_in_error", Integer.MAX_VALUE);
-        obj.put("sum_out_discard", 0);
-        obj.put("avg_out_error", 0);
-        return obj;
-    }
+	
 
     private static void aggregateValues(JSONObject aggregated, JSONObject record) {
         aggregated.put("count_in_discard", aggregated.getInt("sum_in_discard") + record.getInt("count_in_discard"));

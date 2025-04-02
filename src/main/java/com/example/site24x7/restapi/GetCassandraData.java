@@ -5,6 +5,9 @@ import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
 import com.example.site24x7.db.DatabaseConfig;
+import com.example.site24x7.queries.RESTAPIQueries;
+import com.example.site24x7.setter.setDataCassandra;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -21,13 +24,7 @@ public class GetCassandraData {
         JSONObject res = new JSONObject();
         CqlSession session = DatabaseConfig.getCassandraSession();
         try {
-            String CqueryPID = """
-                    SELECT 
-                    	interface_idx 
-                    FROM snmp_interface_traffic 
-                    WHERE interface_ip= ? 
-                    GROUP BY interface_ip,interface_idx;
-                    """;
+            String CqueryPID = RESTAPIQueries.CqueryPID;
 
             List<Integer> arr = new ArrayList<Integer>();
             PreparedStatement preparedStatement = session.prepare(CqueryPID);
@@ -40,8 +37,7 @@ public class GetCassandraData {
 
             String placeholders = String.join(",", Collections.nCopies(arr.size(), "?"));
 
-            String Cquery = "SELECT " + "primary_id, " + "interface_ip, " + "interface_idx, " + "AVG(avg_in_traffic) AS avg_in_traffic, " + "AVG(avg_out_traffic) AS avg_out_traffic, " + "AVG(avg_in_error) AS avg_in_error, " + "AVG(avg_out_error) AS avg_out_error, " + "AVG(avg_in_discard) AS avg_in_discard, " + "AVG(avg_out_discard) AS avg_out_discard " + "FROM snmp_interface_traffic " + "WHERE interface_ip = ? " + "AND interface_idx IN (" + placeholders + ") " + "AND hour_slot >= ? " + "GROUP BY interface_ip, interface_idx;";
-
+            String Cquery = RESTAPIQueries.Cquery(placeholders);
             String inter = getTimestamp(interval);
             preparedStatement = session.prepare(Cquery);
             JSONArray resultArray = new JSONArray();
@@ -57,14 +53,7 @@ public class GetCassandraData {
 
             // Process results
             for (Row row : resultSet) {
-                JSONObject avgObj = new JSONObject();
-                avgObj.put("interface_id", row.getInt("primary_id"));
-                avgObj.put("avg_in_traffic", row.getDouble("avg_in_traffic"));
-                avgObj.put("avg_out_traffic", row.getDouble("avg_out_traffic"));
-                avgObj.put("avg_in_error", row.getDouble("avg_in_error"));
-                avgObj.put("avg_out_error", row.getDouble("avg_out_error"));
-                avgObj.put("avg_in_discard", row.getDouble("avg_in_discard"));
-                avgObj.put("avg_out_discard", row.getDouble("avg_out_discard"));
+                JSONObject avgObj = setDataCassandra.setCassanData(row);
                 resultArray.put(avgObj);
             }
             res.put("data", resultArray);
